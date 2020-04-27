@@ -23,3 +23,4 @@ lifecycle/
 __ConfigTemp/
 */.settings
 soa-backup/
+data/
