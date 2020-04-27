@@ -1,2 +1,25 @@
 # Default ignored files
 /workspace.xml
+*.iml
+Servers/
+.DS_Store
+.plugins/
+.mylyn/
+.idea/
+out/
+target/
+.classpath
+.project
+.settings
+.externalToolBuilders
+Thumbs.db
+classes/
+*.pid
+bin/
+build/
+.metadata/
+logs/
+lifecycle/
+__ConfigTemp/
+*/.settings
+soa-backup/
