@@ -53,6 +53,8 @@ def FM(user_feature_columns, item_feature_columns, l2_reg_embedding=1e-6, init_s
 
     model = Model(inputs=user_inputs_list + item_inputs_list, outputs=output)
 
+    print("----------------type(user_inputs_list)----------------")
+    print(type(user_inputs_list))
     model.__setattr__("user_input", user_inputs_list)
     model.__setattr__("user_embedding", user_vector_sum)
 

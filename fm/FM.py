@@ -3,12 +3,15 @@ from deepctrplus.inputs import SparseFeat, VarLenSparseFeat
 from preprocess import gen_data_set, gen_model_input
 from sklearn.preprocessing import LabelEncoder
 from tensorflow.python.keras.models import Model
-
 from deepmatchplus.models import *
+
+from pandasql import sqldf
+pysqldf = lambda q: sqldf(q, globals())
+
 
 if __name__ == "__main__":
 
-    data = pd.read_csvdata = pd.read_csv("../data/movielens_sample.txt")
+    data =  pd.read_csv("../data/movielens_sample.txt")
     sparse_features = ["movie_id", "user_id",
                        "gender", "age", "occupation", "zip", ]
     SEQ_LEN = 50
@@ -53,8 +56,7 @@ if __name__ == "__main__":
 
     # 3.Define Model and train
 
-    # model = DSSM(user_feature_columns, item_feature_columns)
-    model = FM(user_feature_columns,item_feature_columns)
+    model = FM(user_feature_columns, item_feature_columns)  # FM(user_feature_columns,item_feature_columns)
 
     model.compile(optimizer='adagrad', loss="binary_crossentropy")
 
