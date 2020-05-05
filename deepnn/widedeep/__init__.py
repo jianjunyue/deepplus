@@ -41,7 +41,7 @@ model.compile(loss="mean_squared_error",
 # 未设置频率 默认每个epoch验证一次
 history = model.fit(x_train_scaled, y_train,
                     validation_data = (x_valid_scaled, y_valid),
-                    epochs = 100
+                    epochs = 5
                     )
 
 # 画学习曲线
@@ -50,7 +50,9 @@ def plot_learning_curves(history):
     plt.grid(True)
     plt.gca().set_ylim(0, 1)
     plt.show()
-plot_learning_curves(history)
+# plot_learning_curves(history)
 
 # 测试
-model.evaluate(x_test_scaled, y_test)
+result = model.evaluate(x_test_scaled, y_test)
+# print('\ntest loss',loss)
+print('result',result)

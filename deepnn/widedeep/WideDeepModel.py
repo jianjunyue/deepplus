@@ -4,6 +4,8 @@ import tensorflow as tf
 
 # 方式二子类API
 # 子类API
+
+
 class WideDeepModel(keras.models.Model):
     def __init__(self):
         super(WideDeepModel, self).__init__()

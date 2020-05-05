@@ -3,9 +3,7 @@ import tensorflow as tf
 from pandas import np
 import pandas as pd
 from sklearn.model_selection import train_test_split
-
 from deepnn.mlp.MLP import MLP
-from deepnn.mlp.MNISTLoader import MNISTLoader
 
 (train_data, train_label), (test_data, test_label) = tf.keras.datasets.mnist.load_data()
 #
@@ -25,16 +23,16 @@ learning_rate = 0.001
 optimizer = tf.keras.optimizers.Adam(learning_rate=learning_rate)
 
 model = MLP()
-# model.build(input_shape=(None, 8))
 
 model.compile(loss=tf.keras.losses.sparse_categorical_crossentropy,
-              optimizer=optimizer
+              optimizer=optimizer,
+              metrics=['accuracy']
               )
 
 # 未设置频率 默认每个epoch验证一次
 history = model.fit(x_train_scaled, y_train,
                     validation_data = (x_valid_scaled, y_valid),
-                    epochs = 5
+                    epochs = 2
                     )
 
 # 画学习曲线
@@ -48,9 +46,9 @@ plot_learning_curves(history)
 
 
 # 测试
-model.evaluate(x_valid_scaled, y_valid)
-
-
+loss,accuracy = model.evaluate(x_valid_scaled, y_valid)
+print('\ntest loss',loss)
+print('accuracy',accuracy)
 
 
 
