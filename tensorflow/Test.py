@@ -1,94 +1,37 @@
 import tensorflow as tf
+import pandas as pd
 
+# 在线下载汽车效能数据集
 
-x = tf.random.normal([10,35,8])
+dataset_path = tf.keras.utils.get_file("auto-mpg.data","http://archive.ics.uci.edu/ml/machine-learning-databases/auto-mpg/autompg.data")
+# 利用 pandas 读取数据集，字段有效能（公里数每加仑），气缸数，排量，马力，重量
+# 加速度，型号年份，产地
+column_names = ['MPG','Cylinders','Displacement','Horsepower','Weight',
+ 'Acceleration', 'Model Year', 'Origin']
+raw_dataset = pd.read_csv(dataset_path, names=column_names,
+ na_values = "?", comment='\t',
+ sep=" ", skipinitialspace=True)
+dataset = raw_dataset.copy()
+# print(dataset.head())
 
-result = tf.split(x,axis=0,num_or_size_splits=[4,2,2,2])
-#
-# print(result[0].shape)
-#
-# result = tf.unstack(x,axis=0) # Unstack 为长度为 1
-# print(len(result))
-# print(result[0].shape)
-#
-# x = tf.ones([2,2])
-# print(x)
-# print(tf.norm(x,ord=1))
-# print(tf.norm(x,ord=2))
-#
-# out = tf.random.normal([4,10]) # 网络预测输出
-# y = tf.constant([1,2,2,0]) # 真实标签
-# y = tf.one_hot(y,depth=10) # one-hot 编码
-# loss = tf.keras.losses.mse(y,out) # 计算每个样本的误差
-# loss1 = tf.reduce_mean(loss) # 平均误差
-# print(loss)
-# print(loss1)
+origin = dataset.pop('Origin')
+dataset['USA'] = (origin == 1)*1.0
+dataset['Europe'] = (origin == 2)*1.0
+dataset['Japan'] = (origin == 3)*1.0
+# 切分为训练集和测试集
+train_dataset = dataset.sample(frac=0.8,random_state=0)
+test_dataset = dataset.drop(train_dataset.index)
+# 移动 MPG 油耗效能这一列为真实标签 Y
+train_labels = train_dataset.pop('MPG')
+test_labels = test_dataset.pop('MPG')
 
-# out = tf.random.normal([2,10])
-# max=tf.reduce_max(out, axis=1) # 返回第一维概率最大的值
-# pred = tf.argmax(out, axis=1) # 返回第一维概率最大值的位置
-# argmin = tf.argmin(out, axis=1) # 返回第一维概率最小值的位置
-# print(out)
-# print(max)
-# print(pred)
-# print(argmin)
-# a=tf.random.uniform([2,5],maxval=5,dtype=tf.int32)
-# b=tf.random.uniform([2,5],maxval=5,dtype=tf.int32)
-#
-# c=tf.equal(a,b)
-# d = tf.cast(c, dtype=tf.float32) # 布尔型转 int 型
-# e=tf.reduce_sum(d,axis=1)
-# f=tf.reduce_sum(d)
-# print(a)
-# print(b)
-# print(c)
-# print(d)
-# print(e)
-# print(f)
-# g=tf.math.greater(a,b)
-# print("g",g)
-#
-# h=tf.math.less(a,b)
-# print("h",h)
-#
-# m=tf.math.greater_equal(a,b)
-# print("m",m)
-#
-# n=tf.math.less_equal(a,b)
-# print("n",n)
-#
-# l=tf.math.not_equal(a,b)
-# print("l",l)
-#
-# t=tf.math.is_nan(a)
-# print("t",t)
+print(train_dataset.shape,train_labels.shape)
+print(test_dataset.shape, test_labels.shape)
 
-# b = tf.constant([1,2,3,4])
-# print(b.shape)
-# #
-# shapep = tf.constant([[1,3]])
-# print(p.shape)
-# # c = tf.pad(b, p) # 填充
-# # print(c)
-#
-# b = tf.constant([[1, 2, 3, 4]])
-# print(b.shape)
-# p = tf.constant([[1,3],[1,2]])
-# print(p.shape)
-# c = tf.pad(b, p) # 填充
-# print(c)
+train_db = tf.data.Dataset.from_tensor_slices((train_dataset.values,train_labels.values)) # 构建 Dataset 对象
+train_db = train_db.shuffle(100).batch(32) # 随机打散，批量化
 
-print("---------------")
-b = tf.constant([[1,3],[1,2]])
-print(b.shape)
-p = tf.constant([[1,3],[1,2]])
-print(p.shape)
-c = tf.pad(b, p) # 填充
-print(c)
-# print("---------------")
-# b = tf.constant([[1,2],[3,4]]) # 填充
-# print(b.shape)
-# p = tf.constant([[1,3],[1,2]])
-# print(p.shape)
-# c = tf.pad(b, p) # 填充
-# print(c)
+for x,y in train_db:
+    print(x)
+    print(y)
+
