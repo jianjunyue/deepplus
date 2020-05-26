@@ -3,6 +3,8 @@ import tensorflow as tf
 from pandas import np
 import pandas as pd
 
+# TensorFlow2.0 实现FM
+# https://blog.csdn.net/qq_34333481/article/details/103919923
 class FM_Model(tf.keras.Model):
 
     def __init__(self, num_feat, num_field, reg_l1=0.01, reg_l2=0.01, embedding_size=10):

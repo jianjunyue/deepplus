@@ -9,6 +9,8 @@ from deepnn.lr.LinearModel import Linear
 x_train_scaled, x_valid_scaled, y_train, y_valid = train_test_split(train_data, train_label, random_state = 7)
 # print(x_train_scaled)
 
+## 以该LR模型为基础演练其它模型！！！！！
+
 num_epochs = 5
 batch_size = 50
 learning_rate = 0.001
