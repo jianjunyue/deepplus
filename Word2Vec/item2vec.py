@@ -1,17 +1,31 @@
 ## 第一阶段，先做movies与user的分级分布
 import warnings
+
+from tensorboard.notebook import display
+
 warnings.filterwarnings(action='ignore')
+
 import pandas as pd
 import numpy as np
+import gensim
 from gensim.models import Word2Vec
 from sklearn.model_selection import train_test_split
-from gensim.models import doc2vec
+
+import gc
 import random
 import datetime
 
 import matplotlib.pyplot as plt
 path="/Users/apple/PycharmProjects/deepplus/data/ml-20m/"
 ##数据导入，只需要用到movies电影数据集和评分数据集
+
+# df_movies = pd.read_csv(path+'movies.dat')
+# df_ratings = pd.read_csv(path+'/data/ml-20m/ratings.dat')
+
+# 用户信息
+# unames = ['user_id', 'gender', 'age', 'occupation', 'zip']
+# users = pd.read_table(path+'users.dat', sep='::', header=None, names=unames, engine='python')
+
 # 电影排名
 rnames = ['userId', 'movieId', 'rating', 'timestamp']
 df_ratings = pd.read_table(path+'ratings.dat', sep='::', header=None, names=rnames,engine='python')
@@ -26,6 +40,29 @@ print(df_movies.head())
 movieId_to_name = pd.Series(df_movies.title.values, index = df_movies.movieId.values).to_dict()
 name_to_movieId = pd.Series(df_movies.movieId.values, index = df_movies.title.values).to_dict()
 
+#随机打印5条记录在数据集里
+for df in list((df_movies, df_ratings)):
+    rand_idx = np.random.choice(len(df), 5, replace=False)
+    # display(df.iloc[rand_idx, :])
+    print(f"Displaying 5 of the total {str(len(df))} data points")
+
+##分析数据阶段
+plt.figure(figsize=(6, 4))
+ax = plt.subplot(111)
+
+ax.set_title("Distribution of Movie Ratings")
+ax.spines["top"].set_visible(False)
+ax.spines["right"].set_visible(False)
+
+# plt.xticks(fontsize=12)
+# plt.yticks(fontsize=12)
+plt.xlabel("Movie Rating")
+plt.ylabel("Count")
+plt.hist(df_ratings['rating'])
+plt.show()
+##数据集切分
+start = datetime.datetime.now()
+
 df_ratings_train, df_ratings_test = train_test_split(df_ratings,
                                                     stratify=df_ratings['userId'], #按userID分布做划分
                                                     random_state=1234,
@@ -33,9 +70,7 @@ df_ratings_train, df_ratings_test = train_test_split(df_ratings,
 print(f"Number of rating data: {str(len(df_ratings_train))}")
 print(f"Number of test data: {str(len(df_ratings_test))}")
 
-print("df_ratings_train:")
-print(df_ratings_train.head())
-
+print(f"Time passed: {str(datetime.datetime.now() - start)}")
 
 ##构建item序列，并根据分数来做类别划分，然后根据分组来确定最终的item序列
 def rating_splitter(df):
@@ -44,16 +79,18 @@ def rating_splitter(df):
     gp_user_like = df.groupby(['liked', 'userId'])
 
     return ([gp_user_like.get_group(gp)['movieId'].tolist() for gp in gp_user_like.groups])
+start = datetime.datetime.now()
 
 pd.options.mode.chained_assignment = None
 splitted_movies = rating_splitter(df_ratings_train)
+
+print(f"Time passed: {str(datetime.datetime.now() - start)}")
 
 ##使用gensim的word2vec训练item2vec模型
 for movie_list in splitted_movies:
     random.shuffle(movie_list)
 
-print("splitted_movies:")
-print(splitted_movies[0])
+start = datetime.datetime.now()
 
 model = Word2Vec(sentences=splitted_movies,  # 迭代序列
                  iter=5,  # 迭代次数
@@ -65,6 +102,7 @@ model = Word2Vec(sentences=splitted_movies,  # 迭代序列
                  negative=5,  # 负采样
                  window=5)  # 当前词和预测词的最大间隔
 
+print(f"Time passed: {str(datetime.datetime.now() - start)}")
 ##保存模型，保存了所有模型相关的信息，隐藏权重，词汇频率和模型二叉树，保存为word2vec文本格式，不能追加训练
 model.wv.save_word2vec_format(path+"model/item2vec_model_0315.bin", binary=True)
 model.wv.save_word2vec_format(path+"model/item2vec_model_0315.txt", binary=False)
