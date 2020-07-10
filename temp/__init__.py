@@ -4,9 +4,9 @@ from __future__ import division
 import numpy as np
 import tensorflow as tf
 from scipy.sparse import coo_matrix
-
 path="C:\\Users\\lejianjun\\git\\deepplus\\data\\"
 train_file =path+ 'HanXiaoyang\\data\\'
+# import faiss
 
 def readPath(file):
     return train_file+file
